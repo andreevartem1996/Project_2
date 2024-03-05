@@ -5,9 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Util {
-    // реализуйте настройку соеденения с БД
     private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/my_test_1";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/user";
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "voldemar1996";
 

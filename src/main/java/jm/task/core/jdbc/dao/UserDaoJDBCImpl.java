@@ -8,20 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    Connection connection = Util.getConnection();
-
     public UserDaoJDBCImpl() {
 
     }
 
     public void createUsersTable() {
-        Statement statement;
-        String sqlCommand = "CREATE TABLE IF NOT EXISTS user (id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(20)," +
-                "lastName VARCHAR(20), age TINYINT)";
-
-        try {
-            statement = connection.createStatement();
-            statement.executeUpdate(sqlCommand);
+        try (Connection connection = Util.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS user (id BIGINT PRIMARY KEY AUTO_INCREMENT," +
+                    " name VARCHAR(20), lastName VARCHAR(20), age TINYINT)");
             System.out.println("Таблица создана");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -29,26 +24,19 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void dropUsersTable() {
-        Statement statement;
-        String sqlCommand = "DROP TABLE IF EXISTS user";
-
-        try {
-            statement = connection.createStatement();
-            statement.executeUpdate(sqlCommand);
+        try (Connection connection = Util.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate("DROP TABLE IF EXISTS user");
             System.out.println("Таблица удалена");
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        PreparedStatement preparedStatement;
-        String sqlCommand = "INSERT INTO user (name, lastName, age) VALUES (?, ?, ?)";
-
-        try {
-            preparedStatement = connection.prepareStatement(sqlCommand);
-
+        try (Connection connection = Util.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement
+                     ("INSERT INTO user (name, lastName, age) VALUES (?, ?, ?)")) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
@@ -61,11 +49,10 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        PreparedStatement preparedStatement;
-        String sqlCommand = "DELETE FROM user WHERE id = ?";
+        try (Connection connection = Util.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement
+                     ("DELETE FROM user WHERE id = ?")) {
 
-        try {
-            preparedStatement = connection.prepareStatement(sqlCommand);
             preparedStatement.setLong(1, id);
             int infoDelete = preparedStatement.executeUpdate();
             if (infoDelete > 0) {
@@ -81,11 +68,8 @@ public class UserDaoJDBCImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
 
-        PreparedStatement preparedStatement;
-        String sqlCommand = "SELECT * FROM user";
-
-        try {
-            preparedStatement = connection.prepareStatement(sqlCommand);
+        try (Connection connection = Util.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user")) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 User user = new User();
@@ -102,11 +86,8 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        PreparedStatement preparedStatement;
-        String sqlCommand = "DELETE FROM user ";
-
-        try {
-            preparedStatement = connection.prepareStatement(sqlCommand);
+        try (Connection connection = Util.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM user")) {
             preparedStatement.executeUpdate();
             System.out.println("Все пользователи удалены из таблицы.");
         } catch (SQLException e) {
