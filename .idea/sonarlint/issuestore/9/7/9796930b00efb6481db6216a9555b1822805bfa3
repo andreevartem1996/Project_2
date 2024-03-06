@@ -1,7 +1,0 @@
-
-W
-java:S1118":Add a private constructor to hide the implicit public one.(ืผญฦ8าะทำเ1
-X
-java:S6437"6Revoke and change this password, as it is compromised.(ฆภห๋๙ÿÿÿÿ8ฺะทำเ1
-T	java:S106"9Replace this use of System.out or System.err by a logger.(ม–ๅD8Üะทำเ1
-U	java:S106"9Replace this use of System.out or System.err by a logger.(๗ุื’8Þะทำเ1
