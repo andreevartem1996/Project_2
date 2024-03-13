@@ -1,9 +1,10 @@
 package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import java.util.List;
 
@@ -14,10 +15,12 @@ public class UserDaoHibernateImpl implements UserDao {
 
     }
 
+    private static final SessionFactory sessionFactory = getSessionFactory();
+
     @Override
     public void createUsersTable() {
-        Transaction transaction = null;
-        try (Session session = getSessionFactory().openSession()) {
+        Transaction transaction;
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
             session.createSQLQuery("CREATE TABLE IF NOT EXISTS user " +
@@ -28,26 +31,20 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction.commit();
             System.out.println("Таблица создана");
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void dropUsersTable() {
-        Transaction transaction = null;
-        try (Session session = getSessionFactory().openSession()) {
+        Transaction transaction;
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
             session.createSQLQuery("DROP TABLE IF EXISTS user").executeUpdate();
             transaction.commit();
             System.out.println("Таблица удалена");
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             e.printStackTrace();
         }
     }
@@ -55,7 +52,7 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Transaction transaction = null;
-        try (Session session = getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
             User user = new User();
@@ -78,7 +75,7 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void removeUserById(long id) {
         Transaction transaction = null;
-        try (Session session = getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
             User user = session.get(User.class, id);
@@ -102,11 +99,11 @@ public class UserDaoHibernateImpl implements UserDao {
         Transaction transaction = null;
         List<User> userList = null;
 
-        try (Session session = getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
-            Criteria criteria = session.createCriteria(User.class);
-            userList = criteria.list();
+            Query<User> query = session.createQuery("FROM User");
+            userList = query.list();
 
             transaction.commit();
             System.out.println("Все пользователи получены из таблицы.");
@@ -122,14 +119,11 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void cleanUsersTable() {
         Transaction transaction = null;
-        try (Session session = getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
-            Criteria criteria = session.createCriteria(User.class);
-            List<User> users = criteria.list();
-            for (User user : users) {
-                session.delete(user);
-            }
+            Query query = session.createSQLQuery("DELETE FROM user");
+            query.executeUpdate();
 
             transaction.commit();
             System.out.println("Все пользователи успешно удалены из таблицы.");
